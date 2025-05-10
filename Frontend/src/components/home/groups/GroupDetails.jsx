@@ -97,16 +97,21 @@ const handleDownload = async () => {
   return (
     <div className="p-6 bg-gray-50 dark:bg-gray-900 min-h-screen">
       {/* Header */}
-      <div className="flex items-center justify-between mb-6">
-        <h1 className="text-3xl font-bold text-gray-900 dark:text-gray-100">{state?.groupName || ""}</h1>
-        <div className="flex space-x-2">
-          <span className="inline-flex items-center px-2 py-1 text-sm bg-indigo-100 dark:bg-indigo-700 text-indigo-800 dark:text-indigo-200 rounded">Invite Code: {state?.inviteCode || ""}</span>
-          <Button onClick={() => handleDownload()}>Export Settlement History</Button>
-          <Button onClick={() => setSettleAllModalOpen(true)}>Settle All</Button>
-          <Button onClick={() => setExpenseModalOpen(true)}>Add Expense</Button>
-          <Button onClick={() => setInviteModalOpen(true)}>Invite</Button>
-        </div>
-      </div>
+      <div className="flex flex-col md:flex-row md:items-center justify-between mb-6 gap-4">
+  <h1 className="text-3xl font-bold text-gray-900 dark:text-gray-100">
+    {state?.groupName || ""}
+  </h1>
+
+  <div className="flex flex-wrap items-center gap-2">
+    <span className="inline-flex items-center px-2 py-1 text-sm bg-indigo-100 dark:bg-indigo-700 text-indigo-800 dark:text-indigo-200 rounded">
+      Invite Code: {state?.inviteCode || ""}
+    </span>
+    <Button onClick={() => handleDownload()}>Export Settlement History</Button>
+    <Button onClick={() => setSettleAllModalOpen(true)}>Settle All</Button>
+    <Button onClick={() => setExpenseModalOpen(true)}>Add Expense</Button>
+    <Button onClick={() => setInviteModalOpen(true)}>Invite</Button>
+  </div>
+</div>
 
       {/* Summary */}
       <motion.div initial={{ opacity:0 }} animate={{ opacity:1 }} className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">

@@ -260,7 +260,7 @@ export default function AddExpenseModal({
                 data-name-input
                 className={`${inputClasses} ${
                   errors.name ? "border-red-500" : ""
-                } sm:pl-4 sm:leading-2`}
+                } pl-4 sm:pl-4 sm:leading-2`}
                 placeholder="e.g. Lunch at cafe"
               />
               {/* <DollarSign className="pointer-events-none col-start-1 row-start-1 ml-3 size-5 self-center text-gray-400 dark:text-gray-300 sm:size-4" /> */}
@@ -281,7 +281,7 @@ export default function AddExpenseModal({
                 data-description-input
                 className={`${inputClasses} ${
                   errors.description ? "border-red-500" : ""
-                } sm:pl-4 sm:leading-2`}
+                } pl-4 sm:pl-4 sm:leading-2`}
                 placeholder="e.g. Lunch at cafe"
               />
               {/* <DollarSign className="pointer-events-none col-start-1 row-start-1 ml-3 size-5 self-center text-gray-400 dark:text-gray-300 sm:size-4" /> */}
@@ -336,7 +336,7 @@ export default function AddExpenseModal({
                 {...register("amount")}
                 className={`${inputClasses} ${
                   errors.amount ? "border-red-500" : ""
-                } sm:pl-4 sm:leading-2`}
+                } pl-4 sm:pl-4 sm:leading-2`}
                 placeholder="e.g. 500"
               />
               {/* <DollarSign className="pointer-events-none col-start-1 row-start-1 ml-3 size-5 self-center text-gray-400 dark:text-gray-300 sm:size-4" /> */}

@@ -8,20 +8,18 @@ import JoinGroup from "./JoinGroup";
 // import { Button } from "../components/ui/button";
 
 export default function GroupsList() {
-  // const [groups, setGroups] = useState([]);
-  const navigate = useNavigate()
+  const navigate = useNavigate();
   const [isModalOpen, setModalOpen] = useState(false);
   const [isJoinOpen, setJoinOpen] = useState(false);
 
   const { data: groups, refetch } = useQuery("api/groups/my");
-  console.log(groups)
 
   return (
-    <div className="p-6">
-      <div className="flex justify-between items-center mb-6">
+    <div className="px-4 sm:px-6 md:px-8 py-6 w-full max-w-7xl mx-auto">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
         <h2 className="text-2xl font-bold">Your Groups</h2>
-        <div>
-          <Button className="mr-3" onClick={() => setJoinOpen(true)}>Join Group</Button>
+        <div className="flex flex-row gap-3">
+          <Button onClick={() => setJoinOpen(true)}>Join Group</Button>
           <Button onClick={() => setModalOpen(true)}>Create Group</Button>
         </div>
       </div>
@@ -37,7 +35,7 @@ export default function GroupsList() {
             netBalance={g.netBalance}
             baseCurrency={g.baseCurrency}
             onClick={() => navigate(`/home/groups/${g.id}`, {
-              state:g,
+              state: g,
             })}
           />
         ))}
@@ -47,14 +45,12 @@ export default function GroupsList() {
         isOpen={isModalOpen}
         onClose={() => setModalOpen(false)}
         refetch={refetch}
-        // onCreate={handleCreate}
       />
 
       <JoinGroup
         isOpen={isJoinOpen}
         onClose={() => setJoinOpen(false)}
         refetch={refetch}
-        // onCreate={handleCreate}
       />
     </div>
   );
