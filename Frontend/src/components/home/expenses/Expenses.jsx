@@ -1,37 +1,21 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { Plus, Calendar, Trash } from 'lucide-react';
+import { Plus, Calendar } from 'lucide-react';
 import AddExpenseModal from './AddExpenseModal';
 import { format } from 'date-fns';
 import useQuery from '@/hooks/useQuery';
 
-const fetchExpenses = async () => ([
-  { id: 1, description: 'Dinner at XYZ', amount: 400, payer: 'Alice', date: '2025-05-01' },
-  { id: 2, description: 'Uber Ride', amount: 250, payer: 'Bob', date: '2025-05-03' },
-  { id: 3, description: 'Movie Tickets', amount: 600, payer: 'Charlie', date: '2025-05-05' },
-]);
-
 export default function Expenses() {
-//   const [expenses, setExpenses] = useState([]);
   const [modalOpen, setModalOpen] = useState(false);
 
-//   useEffect(() => {
-//     fetchExpenses().then(setExpenses);
-//   }, []);
-
   const { data: groups } = useQuery("api/groups/my");
-  console.log(groups)
 
   const { data, refetch } = useQuery("api/expenses/my");
 
   const handleAdd = (newExpense) => {
     setExpenses(prev => [...prev, { ...newExpense, id: Date.now() }]);
     setModalOpen(false);
-  };
-
-  const handleDelete = (id) => {
-    setExpenses(prev => prev.filter(exp => exp.id !== id));
   };
 
   return (
@@ -53,7 +37,6 @@ export default function Expenses() {
               <TableHead>Payer</TableHead>
               <TableHead>Amount</TableHead>
               <TableHead>Date</TableHead>
-              <TableHead className="text-right">Action</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -68,11 +51,6 @@ export default function Expenses() {
                     <Calendar className="w-4 h-4" />
                     {format(new Date(exp.date), 'dd MMM yyyy')}
                   </div>
-                </TableCell>
-                <TableCell className="text-right">
-                  <Button variant="ghost" size="icon" onClick={() => handleDelete(exp.id)}>
-                    <Trash className="w-4 h-4 text-red-500" />
-                  </Button>
                 </TableCell>
               </TableRow>
             ))}
