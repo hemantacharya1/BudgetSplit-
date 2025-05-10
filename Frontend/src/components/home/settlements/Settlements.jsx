@@ -1,15 +1,36 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { Calendar, Trash } from 'lucide-react';
+import { Plus, Calendar, Trash } from 'lucide-react';
+import AddExpenseModal from './AddExpenseModal';
 import { format } from 'date-fns';
 import useQuery from '@/hooks/useQuery';
 
+const fetchExpenses = async () => ([
+  { id: 1, description: 'Dinner at XYZ', amount: 400, payer: 'Alice', date: '2025-05-01' },
+  { id: 2, description: 'Uber Ride', amount: 250, payer: 'Bob', date: '2025-05-03' },
+  { id: 3, description: 'Movie Tickets', amount: 600, payer: 'Charlie', date: '2025-05-05' },
+]);
+
 export default function Settlements() {
+//   const [expenses, setExpenses] = useState([]);
+  const [modalOpen, setModalOpen] = useState(false);
+
+//   useEffect(() => {
+//     fetchExpenses().then(setExpenses);
+//   }, []);
 
   const { data: groups } = useQuery("api/groups/my");
+  console.log(groups)
 
-  const { data } = useQuery(`api/expenses/settlement/${2}`);
+  const { data, refetch } = useQuery(`api/expenses/settlement/${2}`);
+
+  console.log(data, "dddddddddddddd")
+
+  const handleAdd = (newExpense) => {
+    setExpenses(prev => [...prev, { ...newExpense, id: Date.now() }]);
+    setModalOpen(false);
+  };
 
   const handleDelete = (id) => {
     setExpenses(prev => prev.filter(exp => exp.id !== id));
@@ -19,6 +40,9 @@ export default function Settlements() {
     <div className="p-6 bg-gray-50 dark:bg-gray-900 min-h-screen">
       <div className="flex items-center justify-between mb-6">
         <h1 className="text-3xl font-bold text-gray-900 dark:text-white">All Settlements</h1>
+        <Button onClick={() => setModalOpen(true)} className="flex items-center gap-2">
+          <Plus className="w-4 h-4" /> Add Expense
+        </Button>
       </div>
 
       <div className="bg-white dark:bg-gray-800 rounded-xl shadow p-4">
@@ -54,6 +78,15 @@ export default function Settlements() {
           </TableBody>
         </Table>
       </div>
+
+      <AddExpenseModal
+        isOpen={modalOpen}
+        onClose={() => setModalOpen(false)}
+        onAdd={handleAdd}
+        showGroupSelect={true}
+        groupOptions={groups?.data?.data || []}
+        refetch={refetch}
+      />
     </div>
   );
 }

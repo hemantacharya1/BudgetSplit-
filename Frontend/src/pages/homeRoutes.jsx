@@ -9,7 +9,7 @@ const Home = lazy(() => import("../components/home/dashboard/Home"));
 const Dashboard = lazy(() => import("../components/home/dashboard/dashboard"));
 const GroupsRoutes = lazy(() => import("./groupRoutes/GroupRoutes"));
 const ExpensesRoutes = lazy(() => import("./expenseRoutes/ExpenseRoutes"));
-// const SettlementRoutes = lazy(() => import("./settlementRoutes/SettlementRoutes"));
+const SettlementRoutes = lazy(() => import("./settlementRoutes/SettlementRoutes"));
 const HistoryRoutes = lazy(() => import("./historyRoutes/HistoryRoutes"));
   const Profile = lazy(() => import("../components/home/profile/Profile"));
 function HomeRoutes() {
@@ -26,7 +26,7 @@ function HomeRoutes() {
                 <Route path="dashboard" element={<Dashboard />} />
                 <Route path="groups/*" element={<GroupsRoutes />} />
                 <Route path="expenses/*" element={<ExpensesRoutes />} />
-                {/* <Route path="settlements/*" element={<SettlementRoutes />} /> */}
+                <Route path="settlements/*" element={<SettlementRoutes />} />
                 <Route path="history/*" element={<HistoryRoutes />} />
                 <Route path="profile" element={<Profile />} />
                 <Route path="*" element={<Navigate replace to="/404" />} />

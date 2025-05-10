@@ -26,22 +26,19 @@ const schema = yup.object().shape({
     .typeError("Please enter a valid date"),
   payer: yup.string().required("Payer is required"),
   currency: yup.string().required("Currency is required"),
-  groupId: yup
-    .string()
-    .when("$showGroupSelect", {
-      is: true,
-      then: yup.string().required("Group is required"),
-    }),
+  groupId: yup.string().when("$showGroupSelect", {
+    is: true,
+    then: yup.string().required("Group is required"),
+  }),
 });
 
 export default function AddExpenseModal({
   isOpen,
   onClose,
-  onAdd,
   showGroupSelect = false,
   groupOptions = [],
   refetch,
-  initGroupId
+  initGroupId,
 }) {
   const currentUser = useSelector(selectUser);
 
@@ -62,7 +59,7 @@ export default function AddExpenseModal({
       currency: "",
       amount: "",
       payer: currentUser?.id || "",
-      groupId: initGroupId || "",
+      groupId: "",
       participants: [],
       date: new Date().toISOString().split("T")[0], // 👈 today's date in 'YYYY-MM-DD' format
     },
@@ -76,6 +73,41 @@ export default function AddExpenseModal({
   });
   const watchedParticipants = watch("participants");
   const selectedGroupId = watch("groupId");
+
+  useEffect(() => {
+    if (initGroupId) {
+      const tempMembers =
+        groupOptions
+          ?.find((el) => el.id == initGroupId)
+          ?.usersList?.map((user) => {
+            if (user.id == currentUser.id) {
+              return {
+                id: user.id,
+                label: `${user.firstName} ${user.lastName} (You)`,
+              };
+            } else {
+              return {
+                id: user.id,
+                label: `${user.firstName} ${user.lastName}`,
+              };
+            }
+          }) || [];
+
+      console.log(tempMembers, groupOptions, initGroupId, "ttt");
+
+      setMembers(tempMembers);
+      const parts = tempMembers.map((u) => ({
+        userId: u.id,
+        name: `${u.firstName} ${u.lastName}`,
+        include: false,
+        percentage: 0,
+      }));
+      replace(parts);
+      // set default payer to first member
+      setValue("payer", currentUser?.id || "1");
+      setValue("groupId", initGroupId || "");
+    }
+  }, [initGroupId, groupOptions]);
 
   // initialize participants whenever members change
   useEffect(() => {
@@ -168,8 +200,7 @@ export default function AddExpenseModal({
     });
     if (response.success) {
       onClose();
-      if(refetch){
-
+      if (refetch) {
         refetch();
       }
     }
@@ -193,22 +224,22 @@ export default function AddExpenseModal({
             <div>
               <Label htmlFor="groupId">Select Group</Label>
               <div className="mt-2 grid grid-cols-1">
-              <select
-                id="groupId"
-                {...register("groupId")}
-                className={`block w-full rounded-md bg-white dark:bg-gray-700 py-2 px-3 border ${
-                  errors.groupId
-                    ? "border-red-500"
-                    : "border-gray-300 dark:border-gray-600"
-                } text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-indigo-600 sm:text-sm`}
-              >
-                <option value="">-- Select Group --</option>
-                {groupOptions.map((g) => (
-                  <option key={g.id} value={g.id}>
-                    {g.groupName}
-                  </option>
-                ))}
-              </select>
+                <select
+                  id="groupId"
+                  {...register("groupId")}
+                  className={`block w-full rounded-md bg-white dark:bg-gray-700 py-2 px-3 border ${
+                    errors.groupId
+                      ? "border-red-500"
+                      : "border-gray-300 dark:border-gray-600"
+                  } text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-indigo-600 sm:text-sm`}
+                >
+                  <option value="">-- Select Group --</option>
+                  {groupOptions.map((g) => (
+                    <option key={g.id} value={g.id}>
+                      {g.groupName}
+                    </option>
+                  ))}
+                </select>
               </div>
               {errors.groupId && (
                 <p className="mt-1 text-sm text-red-500">
@@ -229,7 +260,7 @@ export default function AddExpenseModal({
                 data-name-input
                 className={`${inputClasses} ${
                   errors.name ? "border-red-500" : ""
-                }`}
+                } sm:pl-4 sm:leading-2`}
                 placeholder="e.g. Lunch at cafe"
               />
               {/* <DollarSign className="pointer-events-none col-start-1 row-start-1 ml-3 size-5 self-center text-gray-400 dark:text-gray-300 sm:size-4" /> */}
@@ -250,10 +281,10 @@ export default function AddExpenseModal({
                 data-description-input
                 className={`${inputClasses} ${
                   errors.description ? "border-red-500" : ""
-                }`}
+                } sm:pl-4 sm:leading-2`}
                 placeholder="e.g. Lunch at cafe"
               />
-              <DollarSign className="pointer-events-none col-start-1 row-start-1 ml-3 size-5 self-center text-gray-400 dark:text-gray-300 sm:size-4" />
+              {/* <DollarSign className="pointer-events-none col-start-1 row-start-1 ml-3 size-5 self-center text-gray-400 dark:text-gray-300 sm:size-4" /> */}
             </div>
             {errors.description && (
               <p className="mt-1 text-sm text-red-500">
@@ -264,34 +295,36 @@ export default function AddExpenseModal({
 
           {/* Currency */}
           <div>
-                      <Label htmlFor="groupId">Select Currency</Label>
-                      <select
-                        id="currency"
-                        {...register("currency")}
-                        className={`block w-full rounded-md bg-white dark:bg-gray-700 py-2 px-3 border ${
-                          errors.groupId
-                            ? "border-red-500"
-                            : "border-gray-300 dark:border-gray-600"
-                        } text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-indigo-600 sm:text-sm`}
-                      >
-                        <option value="">-- Select Currency --</option>
-                        {[
-                          { label: "INR", value: "INR" },
-                          { label: "USD", value: "USD" },
-                          { label: "EUR", value: "EUR" },
-                          { label: "GBP", value: "GBP" },
-                        ].map((g) => (
-                          <option key={g.value} value={g.value}>
-                            {g.label}
-                          </option>
-                        ))}
-                      </select>
-                      {errors.currency && (
-                        <p className="mt-1 text-sm text-red-500">
-                          {errors.currency.message}
-                        </p>
-                      )}
-                    </div>
+            <Label htmlFor="groupId">Select Currency</Label>
+            <div className="mt-2 grid grid-cols-1">
+              <select
+                id="currency"
+                {...register("currency")}
+                className={`block w-full rounded-md bg-white dark:bg-gray-700 py-2 px-3 border ${
+                  errors.groupId
+                    ? "border-red-500"
+                    : "border-gray-300 dark:border-gray-600"
+                } text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-indigo-600 sm:text-sm`}
+              >
+                <option value="">-- Select Currency --</option>
+                {[
+                  { label: "INR", value: "INR" },
+                  { label: "USD", value: "USD" },
+                  { label: "EUR", value: "EUR" },
+                  { label: "GBP", value: "GBP" },
+                ].map((g) => (
+                  <option key={g.value} value={g.value}>
+                    {g.label}
+                  </option>
+                ))}
+              </select>
+            </div>
+            {errors.currency && (
+              <p className="mt-1 text-sm text-red-500">
+                {errors.currency.message}
+              </p>
+            )}
+          </div>
 
           {/* Amount */}
           <div>
@@ -303,10 +336,10 @@ export default function AddExpenseModal({
                 {...register("amount")}
                 className={`${inputClasses} ${
                   errors.amount ? "border-red-500" : ""
-                }`}
+                } sm:pl-4 sm:leading-2`}
                 placeholder="e.g. 500"
               />
-              <DollarSign className="pointer-events-none col-start-1 row-start-1 ml-3 size-5 self-center text-gray-400 dark:text-gray-300 sm:size-4" />
+              {/* <DollarSign className="pointer-events-none col-start-1 row-start-1 ml-3 size-5 self-center text-gray-400 dark:text-gray-300 sm:size-4" /> */}
             </div>
             {errors.amount && (
               <p className="mt-1 text-sm text-red-500">
@@ -332,17 +365,19 @@ export default function AddExpenseModal({
           {/* Payer */}
           <div>
             <Label htmlFor="payer">Payer</Label>
-            <select
-              {...register("payer")}
-              className="block w-full rounded-md bg-white dark:bg-gray-700 py-2 px-3 border border-gray-300 dark:border-gray-600 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-indigo-600 sm:text-sm"
-            >
-              <option value="">Select payer</option>
-              {members.map((u) => (
-                <option key={u.id} value={u.id}>
-                  {`${u.label}`}
-                </option>
-              ))}
-            </select>
+            <div className="mt-2 grid grid-cols-1">
+              <select
+                {...register("payer")}
+                className="block w-full rounded-md bg-white dark:bg-gray-700 py-2 px-3 border border-gray-300 dark:border-gray-600 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-indigo-600 sm:text-sm"
+              >
+                <option value="">Select payer</option>
+                {members.map((u) => (
+                  <option key={u.id} value={u.id}>
+                    {`${u.label}`}
+                  </option>
+                ))}
+              </select>
+            </div>
             {errors.payer && (
               <p className="mt-1 text-sm text-red-500">
                 {errors.payer.message}

@@ -56,6 +56,11 @@ const {data: expenses, refetch} = useQuery(`api/expenses/group/${state?.id}`)
 
 const {data: settlements, refetch: refetchExpenses} = useQuery(`api/expenses/settlement/${state?.id}`)
 
+const allRefetch = () => {
+  refetch();
+  refetchExpenses()
+}
+
 const handleDownload = async () => {
   try {
     const response = await fetch(`${BACKEND_URL}api/dashboard/group/export-settlements?groupId=${state.id}`, {
@@ -186,6 +191,7 @@ const handleDownload = async () => {
         showGroupSelect={true}
         groupOptions={groups?.data?.data || []}
         initGroupId={state?.id || ""}
+        refetch={allRefetch}
     />
 
     <Invite
